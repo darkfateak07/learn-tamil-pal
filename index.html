@@ -1,24 +1,1551 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanakkam Tamil - Learn Tamil with AI & Gamification</title>
-    <meta name="description" content="Master Tamil language with AI-powered lessons, gamified learning, voice practice, and community challenges. Learn Tamil from basics to fluency." />
-    <meta name="author" content="Vanakkam Tamil" />
+    <meta name="description" content="Master Tamil language with AI-powered lessons, gamified learning, voice practice, and community challenges. Learn Tamil from basics to fluency.">
+    
+    <!-- Firebase -->
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/compat/firebase-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/compat/firebase-analytics.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2dd4bf;
+            --primary-dark: #14b8a6;
+            --primary-light: #7dd3fc;
+            --secondary: #f0fdf4;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
 
-    <meta property="og:title" content="Vanakkam Tamil - AI-Powered Tamil Learning Platform" />
-    <meta property="og:description" content="Learn Tamil with gamified lessons, AI translations, voice practice, and community challenges. From beginner to fluent speaker." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        /* Header Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px rgba(45, 212, 191, 0.3);
+        }
+
+        .brand-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* User Stats */
+        .user-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--secondary);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .xp-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .xp-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--warning), #fbbf24);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff08" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .lesson-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .lesson-card:hover::before {
+            left: 100%;
+        }
+
+        .lesson-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        /* Progress Elements */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 0 10px rgba(45, 212, 191, 0.3);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(45, 212, 191, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message-user {
+            text-align: right;
+        }
+
+        .message-bot {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-user .message-bubble {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-bot .message-bubble {
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 5px;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .user-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .stat-item {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Voice Recording */
+        .recording {
+            background: var(--danger) !important;
+            animation: pulse 1s infinite;
+        }
+
+        /* Streak Fire Effect */
+        .streak-fire {
+            color: #ff4500;
+            text-shadow: 0 0 10px #ff4500;
+        }
+
+        /* Achievement Glow */
+        .achievement-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            border: 2px solid var(--success);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <div class="logo me-2">வ</div>
+                <span class="brand-text">Vanakkam Tamil</span>
+            </div>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showSection('home')">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('learn')">
+                            <i class="bi bi-book me-1"></i>Learn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('chat')">
+                            <i class="bi bi-chat-dots me-1"></i>Chat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('community')">
+                            <i class="bi bi-people me-1"></i>Community
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="user-stats d-none d-md-flex">
+                    <div class="stat-item">
+                        <i class="bi bi-star-fill" style="color: var(--warning);"></i>
+                        <span id="userXP">1247</span> XP
+                    </div>
+                    <div class="stat-item">
+                        <div class="xp-bar">
+                            <div class="xp-progress" id="xpProgress" style="width: 65%"></div>
+                        </div>
+                        Level <span id="userLevel">5</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="bi bi-fire streak-fire"></i>
+                        <span id="userStreak">12</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 hero-content">
+                        <div class="badge badge-primary mb-4 pulse">
+                            <i class="bi bi-robot me-1"></i>
+                            AI-Powered Tamil Learning
+                        </div>
+                        <h1>Master <span style="color: #7dd3fc;">Tamil</span> with<br>Vanakkam Tamil</h1>
+                        <p class="lead">Learn Tamil from basics with gamified lessons, AI-powered translations, and voice practice. From complete beginner to confident speaker.</p>
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            <button class="btn btn-light btn-lg px-4" onclick="showSection('learn')">
+                                <i class="bi bi-play-fill me-2"></i>Start Learning Free
+                            </button>
+                            <button class="btn btn-outline-light btn-lg px-4" onclick="showSection('chat')">
+                                <i class="bi bi-chat-dots me-2"></i>Try AI Chat
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="row mt-5 text-center">
+                            <div class="col-md-4">
+                                <h3 class="display-6 fw-bold">10K+</h3>
+                                <small>Active Learners</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h3 class="display-6 fw-bold">95%</h3>
+                                <small>Success Rate</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h3 class="display-6 fw-bold">24/7</h3>
+                                <small>AI Support</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Start Lessons -->
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">Start Learning Today</h2>
+                <p class="lead text-muted">Jump into quick lessons designed to get you speaking Tamil from day one</p>
+            </div>
+            
+            <div class="row g-4" id="quickLessons">
+                <!-- Quick lessons will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="bg-light py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="display-5 fw-bold mb-3">Why Choose Vanakkam Tamil?</h2>
+                    <p class="lead text-muted">Experience the most effective way to learn Tamil with our innovative features</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="lesson-icon mx-auto" style="background: linear-gradient(135deg, var(--primary), var(--accent));">
+                                    <i class="bi bi-translate"></i>
+                                </div>
+                                <h5 class="card-title">Smart Translation</h5>
+                                <p class="card-text">Your language → English → Tamil with pronunciation guide</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="lesson-icon mx-auto" style="background: linear-gradient(135deg, var(--warning), #fbbf24);">
+                                    <i class="bi bi-trophy"></i>
+                                </div>
+                                <h5 class="card-title">Gamified Learning</h5>
+                                <p class="card-text">Earn XP, badges, and maintain streaks while learning</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="lesson-icon mx-auto" style="background: linear-gradient(135deg, var(--accent), var(--primary-light));">
+                                    <i class="bi bi-mic"></i>
+                                </div>
+                                <h5 class="card-title">Voice Features</h5>
+                                <p class="card-text">Voice input and output for natural conversation practice</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <div class="lesson-icon mx-auto" style="background: linear-gradient(135deg, var(--success), #34d399);">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <h5 class="card-title">Community</h5>
+                                <p class="card-text">Compete with friends and join weekly contests</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learn Section -->
+    <section id="learn" class="section d-none">
+        <div class="container py-5">
+            <div class="row mb-5">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold mb-3">Continue Learning</h1>
+                    <p class="lead text-muted">Keep up your streak and master Tamil step by step!</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end gap-4">
+                        <div class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-fire streak-fire fs-3"></i>
+                                <span class="fs-2 fw-bold ms-1">12</span>
+                            </div>
+                            <small class="text-muted">Day Streak</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-star-fill text-warning fs-3"></i>
+                                <span class="fs-2 fw-bold ms-1">1247</span>
+                            </div>
+                            <small class="text-muted">Total XP</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Progress -->
+            <div class="card mb-5">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Overall Progress</h5>
+                        <span class="badge badge-primary">Level 5</span>
+                    </div>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                    <small class="text-muted">253 XP to reach Level 6</small>
+                </div>
+            </div>
+
+            <!-- Daily Challenges -->
+            <div class="mb-5">
+                <h2 class="h3 mb-4">Daily Challenges</h2>
+                <div class="row g-4" id="dailyChallenges">
+                    <!-- Daily challenges will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Learning Modules -->
+            <div>
+                <h2 class="h3 mb-4">Learning Modules</h2>
+                <div class="row g-4" id="learningModules">
+                    <!-- Learning modules will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section id="chat" class="section d-none">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <div class="lesson-icon mx-auto mb-3" style="background: linear-gradient(135deg, var(--primary), var(--accent));">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <h1 class="display-5 fw-bold mb-3">Tamil Chat Assistant</h1>
+                        <p class="lead text-muted">Your AI-powered Tamil learning companion with voice support</p>
+                    </div>
+
+                    <!-- Quick Prompts -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Quick Start:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="setChatInput('How do I say Good morning in Tamil?')">
+                                How do I say "Good morning" in Tamil?
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="setChatInput('Translate: I love Tamil food')">
+                                Translate "I love Tamil food"
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="setChatInput('Teach me Tamil numbers 1-10')">
+                                Teach me Tamil numbers 1-10
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="setChatInput('What are common Tamil greetings?')">
+                                Common Tamil greetings
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Interface -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-robot me-2 text-primary"></i>
+                                <strong>Chat</strong>
+                                <span class="badge badge-primary ms-2">
+                                    <i class="bi bi-stars me-1"></i>AI Powered
+                                </span>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="clearChat()">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="chat-container" id="chatContainer">
+                                <div class="chat-message message-bot">
+                                    <div class="message-bubble">
+                                        <strong>வணக்கம்! (Vanakkam!)</strong><br><br>
+                                        Welcome to your Tamil learning assistant! 🎉<br><br>
+                                        I can help you with:<br>
+                                        ✨ <strong>Translation:</strong> Type in any language and I'll translate to Tamil with pronunciation<br>
+                                        🎯 <strong>Learning:</strong> Ask questions about Tamil grammar, culture, or phrases<br>
+                                        🗣️ <strong>Practice:</strong> Have conversations to improve your Tamil skills<br>
+                                        📚 <strong>Lessons:</strong> Get explanations about specific topics<br><br>
+                                        What would you like to learn today?
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="chatInput" placeholder="Type your message or question..." onkeypress="if(event.key==='Enter') sendMessage()">
+                                <button class="btn btn-outline-primary" id="voiceBtn" onclick="toggleVoiceRecording()">
+                                    <i class="bi bi-mic"></i>
+                                </button>
+                                <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 text-center" id="voiceStatus" style="display: none;">
+                                <small class="text-muted">
+                                    <span id="voiceStatusText">Listening...</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="section d-none">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">Tamil Learning Community</h1>
+                <p class="lead text-muted">Connect with fellow Tamil learners, compete in challenges, and celebrate your achievements together!</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-people text-primary fs-1 mb-3"></i>
+                            <h3 class="fw-bold">10,247</h3>
+                            <p class="text-muted mb-0">Active Learners</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-trophy text-warning fs-1 mb-3"></i>
+                            <h3 class="fw-bold">1,523</h3>
+                            <p class="text-muted mb-0">Contests Completed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-target text-success fs-1 mb-3"></i>
+                            <h3 class="fw-bold">95%</h3>
+                            <p class="text-muted mb-0">Success Rate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-graph-up text-info fs-1 mb-3"></i>
+                            <h3 class="fw-bold">2.5M</h3>
+                            <p class="text-muted mb-0">Words Learned</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Leaderboard -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-trophy text-warning me-2"></i>
+                                Weekly Leaderboard
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="leaderboard">
+                                <!-- Leaderboard will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Contests & Achievements -->
+                <div class="col-lg-4">
+                    <!-- Weekly Contests -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-calendar-event text-info me-2"></i>
+                                Weekly Contests
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="weeklyContests">
+                                <!-- Weekly contests will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-award text-primary me-2"></i>
+                                Achievements
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="achievements">
+                                <!-- Achievements will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo me-2">வ</div>
+                        <span class="brand-text text-light">Vanakkam Tamil</span>
+                    </div>
+                    <p class="text-muted">Master Tamil language through AI-powered lessons, gamified learning, and community interaction. From complete beginner to confident speaker.</p>
+                    <div class="d-flex align-items-center text-muted">
+                        <span>Made with</span>
+                        <i class="bi bi-heart-fill text-danger mx-1"></i>
+                        <span>for Tamil learners worldwide</span>
+                        <i class="bi bi-globe ms-1"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h6>Learning</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none" onclick="showSection('learn')">Lessons</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none" onclick="showSection('chat')">AI Chat</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none" onclick="showSection('community')">Community</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Challenges</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Support</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none">Help Center</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Contact Us</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <p class="text-muted mb-0">© 2024 Vanakkam Tamil. All rights reserved.</p>
+                <div class="d-flex gap-3">
+                    <a href="mailto:hello@vanakkamtamil.com" class="text-muted">
+                        <i class="bi bi-envelope"></i>
+                    </a>
+                    <a href="https://github.com/vanakkam-tamil" class="text-muted">
+                        <i class="bi bi-github"></i>
+                    </a>
+                    <a href="https://twitter.com/vanakkamtamil" class="text-muted">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA68rYWkyN0f7ZW5rrn5tgKd13vZLHjtyY",
+            authDomain: "vanakkam-tamil-97975.firebaseapp.com",
+            projectId: "vanakkam-tamil-97975",
+            storageBucket: "vanakkam-tamil-97975.firebasestorage.app",
+            messagingSenderId: "304516466558",
+            appId: "1:304516466558:web:246e845f882b222de4d52f",
+            measurementId: "G-K3YGCW2KVL"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const analytics = firebase.analytics();
+
+        // Gemini AI Configuration
+        const GEMINI_API_KEY = "AIzaSyC34Vn4r4b3jyEVJDhVwiyhGaSCXWTpaKQ";
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+
+        // User State
+        let userState = {
+            xp: 1247,
+            level: 5,
+            streak: 12,
+            totalXpForNextLevel: 1500
+        };
+
+        // Voice Recognition State
+        let isRecording = false;
+        let recognition;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            populateContent();
+            initializeVoiceRecognition();
+            
+            // Track page view
+            analytics.logEvent('page_view', {
+                page_title: 'Vanakkam Tamil Home',
+                page_location: window.location.href
+            });
+        });
+
+        function initializeApp() {
+            showSection('home');
+            updateUserStats();
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.remove('d-none');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+
+            // Track section view
+            analytics.logEvent('section_view', {
+                section_name: sectionName
+            });
+        }
+
+        function updateUserStats() {
+            document.getElementById('userXP').textContent = userState.xp;
+            document.getElementById('userLevel').textContent = userState.level;
+            document.getElementById('userStreak').textContent = userState.streak;
+            
+            const progressPercent = (userState.xp / userState.totalXpForNextLevel) * 100;
+            document.getElementById('xpProgress').style.width = progressPercent + '%';
+        }
+
+        function populateContent() {
+            populateQuickLessons();
+            populateDailyChallenges();
+            populateLearningModules();
+            populateLeaderboard();
+            populateWeeklyContests();
+            populateAchievements();
+        }
+
+        function populateQuickLessons() {
+            const quickLessons = [
+                {
+                    title: "Quick Start",
+                    description: "Basic Tamil phrases to get you started",
+                    icon: "bi-play-fill",
+                    xpReward: 25,
+                    difficulty: "Easy",
+                    color: "var(--success)"
+                },
+                {
+                    title: "Daily Practice",
+                    description: "Today's vocabulary lesson",
+                    icon: "bi-target",
+                    xpReward: 50,
+                    difficulty: "Easy",
+                    color: "var(--primary)"
+                },
+                {
+                    title: "Voice Challenge",
+                    description: "Practice pronunciation",
+                    icon: "bi-mic",
+                    xpReward: 75,
+                    difficulty: "Medium",
+                    color: "var(--accent)"
+                }
+            ];
+
+            const container = document.getElementById('quickLessons');
+            container.innerHTML = quickLessons.map(lesson => `
+                <div class="col-md-4">
+                    <div class="card lesson-card h-100" onclick="startLesson('${lesson.title}')">
+                        <div class="card-body text-center">
+                            <div class="lesson-icon mx-auto" style="background: linear-gradient(135deg, ${lesson.color}, ${lesson.color}dd);">
+                                <i class="${lesson.icon}"></i>
+                            </div>
+                            <h5 class="card-title">${lesson.title}</h5>
+                            <p class="card-text text-muted">${lesson.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge badge-${lesson.difficulty.toLowerCase() === 'easy' ? 'success' : lesson.difficulty.toLowerCase() === 'medium' ? 'warning' : 'danger'}">${lesson.difficulty}</span>
+                                <small class="text-muted">
+                                    <i class="bi bi-star-fill text-warning"></i> ${lesson.xpReward} XP
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateDailyChallenges() {
+            const challenges = [
+                {
+                    title: "Daily Vocabulary",
+                    description: "Learn 5 new Tamil words",
+                    reward: "25 XP",
+                    timeLeft: "4h 23m"
+                },
+                {
+                    title: "Pronunciation Challenge",
+                    description: "Practice tongue twisters",
+                    reward: "50 XP",
+                    timeLeft: "4h 23m"
+                },
+                {
+                    title: "Translation Sprint",
+                    description: "Translate 10 sentences",
+                    reward: "40 XP",
+                    timeLeft: "4h 23m"
+                }
+            ];
+
+            const container = document.getElementById('dailyChallenges');
+            container.innerHTML = challenges.map(challenge => `
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-trophy text-warning me-2"></i>
+                                    <h6 class="card-title mb-0">${challenge.title}</h6>
+                                </div>
+                                <span class="badge bg-light text-dark">${challenge.timeLeft}</span>
+                            </div>
+                            <p class="card-text small text-muted">${challenge.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success fw-bold">${challenge.reward}</span>
+                                <button class="btn btn-outline-primary btn-sm" onclick="startChallenge('${challenge.title}')">Start</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateLearningModules() {
+            const modules = [
+                {
+                    title: "Basic Greetings",
+                    description: "Learn essential Tamil greetings and introductions",
+                    icon: "bi-chat-square-text",
+                    progress: 100,
+                    xpReward: 50,
+                    difficulty: "Easy",
+                    isCompleted: true,
+                    badge: "Completed"
+                },
+                {
+                    title: "Numbers & Counting",
+                    description: "Master Tamil numbers from 1 to 100",
+                    icon: "bi-123",
+                    progress: 75,
+                    xpReward: 75,
+                    difficulty: "Easy",
+                    isCompleted: false
+                },
+                {
+                    title: "Family Relations",
+                    description: "Learn words for family members and relationships",
+                    icon: "bi-people",
+                    progress: 45,
+                    xpReward: 100,
+                    difficulty: "Medium",
+                    isCompleted: false
+                },
+                {
+                    title: "Food & Dining",
+                    description: "Vocabulary for food, cooking, and restaurant conversations",
+                    icon: "bi-cup-straw",
+                    progress: 0,
+                    xpReward: 120,
+                    difficulty: "Medium",
+                    isCompleted: false
+                },
+                {
+                    title: "Advanced Grammar",
+                    description: "Complex sentence structures and verb conjugations",
+                    icon: "bi-book",
+                    progress: 0,
+                    xpReward: 200,
+                    difficulty: "Hard",
+                    isCompleted: false,
+                    isLocked: true
+                },
+                {
+                    title: "Pronunciation Practice",
+                    description: "Perfect your Tamil pronunciation with audio exercises",
+                    icon: "bi-headphones",
+                    progress: 30,
+                    xpReward: 80,
+                    difficulty: "Medium",
+                    isCompleted: false
+                }
+            ];
+
+            const container = document.getElementById('learningModules');
+            container.innerHTML = modules.map(module => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card lesson-card h-100 ${module.isCompleted ? 'achievement-glow' : ''} ${module.isLocked ? 'opacity-50' : ''}" 
+                         onclick="${!module.isLocked ? `startModule('${module.title}')` : ''}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="lesson-icon me-3" style="width: 40px; height: 40px; font-size: 1rem; background: ${module.isCompleted ? 'var(--success)' : 'var(--primary)'};">
+                                        <i class="${module.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title mb-1">${module.title}</h6>
+                                        <p class="card-text small text-muted mb-0">${module.description}</p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    ${module.badge ? `<span class="badge badge-success mb-2">${module.badge}</span><br>` : ''}
+                                    ${module.isCompleted ? '<i class="bi bi-trophy text-warning"></i>' : ''}
+                                </div>
+                            </div>
+                            
+                            ${module.progress > 0 ? `
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>Progress</span>
+                                        <span>${module.progress}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 4px;">
+                                        <div class="progress-bar" style="width: ${module.progress}%"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <span class="badge badge-${module.difficulty.toLowerCase() === 'easy' ? 'success' : module.difficulty.toLowerCase() === 'medium' ? 'warning' : 'danger'}">${module.difficulty}</span>
+                                    <small class="text-muted">
+                                        <i class="bi bi-star-fill text-warning"></i> ${module.xpReward} XP
+                                    </small>
+                                </div>
+                                ${!module.isLocked && !module.isCompleted ? '<i class="bi bi-arrow-right text-primary"></i>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateLeaderboard() {
+            const leaderboard = [
+                { rank: 1, name: "Arjun Kumar", xp: 12847, streak: 45, badge: "Tamil Master" },
+                { rank: 2, name: "Priya Selvam", xp: 11203, streak: 32, badge: "Vocabulary Queen" },
+                { rank: 3, name: "Raj Patel", xp: 9876, streak: 28, badge: "Grammar Guru" },
+                { rank: 4, name: "Meera Nair", xp: 8954, streak: 23, badge: "Culture Expert" },
+                { rank: 5, name: "You", xp: 1247, streak: 12, badge: "Rising Star" }
+            ];
+
+            const container = document.getElementById('leaderboard');
+            container.innerHTML = leaderboard.map(user => {
+                const rankIcon = user.rank === 1 ? 'bi-trophy text-warning' : 
+                               user.rank === 2 ? 'bi-award text-secondary' : 
+                               user.rank === 3 ? 'bi-award' : 'bi-hash';
+                
+                return `
+                    <div class="d-flex align-items-center p-3 ${user.name === 'You' ? 'bg-light border rounded' : ''} mb-2">
+                        <div class="me-3">
+                            <i class="${rankIcon} fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center">
+                                <strong>${user.name}</strong>
+                                ${user.name === 'You' ? '<span class="badge badge-primary ms-2">You</span>' : ''}
+                            </div>
+                            <small class="text-muted">${user.badge}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-star-fill text-warning me-1"></i>
+                                <strong>${user.xp.toLocaleString()}</strong>
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi bi-fire text-danger"></i> ${user.streak} days
+                            </small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateWeeklyContests() {
+            const contests = [
+                {
+                    title: "Tamil Poetry Challenge",
+                    description: "Write a 4-line poem in Tamil",
+                    participants: 234,
+                    timeLeft: "2 days",
+                    reward: "500 XP + Poetry Badge",
+                    difficulty: "Hard"
+                },
+                {
+                    title: "Vocabulary Sprint",
+                    description: "Learn 50 new words this week",
+                    participants: 567,
+                    timeLeft: "5 days",
+                    reward: "200 XP",
+                    difficulty: "Medium"
+                },
+                {
+                    title: "Cultural Quiz",
+                    description: "Test your Tamil culture knowledge",
+                    participants: 423,
+                    timeLeft: "3 days",
+                    reward: "150 XP + Culture Badge",
+                    difficulty: "Easy"
+                }
+            ];
+
+            const container = document.getElementById('weeklyContests');
+            container.innerHTML = contests.map(contest => `
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0">${contest.title}</h6>
+                        <span class="badge bg-light text-dark">${contest.timeLeft}</span>
+                    </div>
+                    <p class="small text-muted mb-2">${contest.description}</p>
+                    <div class="d-flex justify-content-between align-items-center text-small mb-2">
+                        <span class="text-muted">${contest.participants} participants</span>
+                        <span class="badge badge-${contest.difficulty.toLowerCase() === 'easy' ? 'success' : contest.difficulty.toLowerCase() === 'medium' ? 'warning' : 'danger'}">${contest.difficulty}</span>
+                    </div>
+                    <div class="border-top pt-2">
+                        <p class="small text-success mb-2">🏆 ${contest.reward}</p>
+                        <button class="btn btn-primary btn-sm w-100" onclick="joinContest('${contest.title}')">Join Contest</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateAchievements() {
+            const achievements = [
+                { name: "First Steps", description: "Complete your first lesson", earned: true, rarity: "Common" },
+                { name: "Week Warrior", description: "Maintain 7-day streak", earned: true, rarity: "Common" },
+                { name: "Social Butterfly", description: "Join 5 community contests", earned: false, rarity: "Rare" },
+                { name: "Tamil Scholar", description: "Complete all beginner lessons", earned: false, rarity: "Epic" },
+                { name: "Culture Master", description: "Score 100% on culture quiz", earned: false, rarity: "Legendary" }
+            ];
+
+            const getRarityClass = (rarity) => {
+                switch(rarity) {
+                    case 'Common': return 'bg-secondary';
+                    case 'Rare': return 'bg-primary';
+                    case 'Epic': return 'bg-purple';
+                    case 'Legendary': return 'bg-warning';
+                    default: return 'bg-secondary';
+                }
+            };
+
+            const container = document.getElementById('achievements');
+            container.innerHTML = achievements.map(achievement => `
+                <div class="d-flex align-items-center p-2 rounded mb-2 ${achievement.earned ? 'bg-success bg-opacity-10' : 'opacity-50'}">
+                    <div class="me-3">
+                        <div class="rounded p-1 ${achievement.earned ? 'bg-success' : 'bg-light'}">
+                            <i class="bi bi-trophy ${achievement.earned ? 'text-white' : 'text-muted'}" style="font-size: 0.8rem;"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">${achievement.name}</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">${achievement.description}</div>
+                    </div>
+                    <span class="badge ${getRarityClass(achievement.rarity)}" style="font-size: 0.6rem;">${achievement.rarity}</span>
+                </div>
+            `).join('');
+        }
+
+        // Chat Functions
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Show loading
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.innerHTML = '<div class="spinner"></div>';
+            sendBtn.disabled = true;
+
+            try {
+                const response = await callGeminiAPI(message);
+                addChatMessage(response, 'bot');
+                
+                // Track chat interaction
+                analytics.logEvent('chat_message_sent', {
+                    message_length: message.length
+                });
+            } catch (error) {
+                console.error('Chat error:', error);
+                addChatMessage("Sorry, I'm having trouble right now. Please try again! 😊", 'bot');
+            } finally {
+                sendBtn.innerHTML = '<i class="bi bi-send"></i>';
+                sendBtn.disabled = false;
+            }
+        }
+
+        async function callGeminiAPI(message) {
+            const isTranslationRequest = message.length > 50 || 
+                message.toLowerCase().includes('translate') || 
+                message.toLowerCase().includes('mean') ||
+                !message.includes('?');
+
+            const prompt = isTranslationRequest ? 
+                `You are a Tamil language learning assistant. Please help with this translation:
+
+                1. First, translate "${message}" to English if it's not already in English
+                2. Then translate the English to Tamil 
+                3. Provide the Tamil pronunciation in English letters (like "vanakkam" for వणక్కం)
+                4. Give the meaning/context
+
+                Format your response as:
+                **Original:** ${message}
+                **English:** [English translation]
+                **Tamil:** [Tamil script]
+                **Pronunciation:** [English pronunciation]  
+                **Meaning:** [Brief explanation of meaning/context]
+
+                Keep it conversational and helpful for language learning.` :
+                
+                `You are "Vanakkam Tamil Assistant", a friendly and encouraging Tamil language learning chatbot.
+
+                User message: ${message}
+
+                Guidelines:
+                - Always be encouraging and supportive
+                - Provide Tamil words with English pronunciation in parentheses
+                - Break down complex concepts into simple steps
+                - Use examples from Tamil culture when relevant
+                - For any Tamil text, always provide English pronunciation
+                - Format responses clearly with line breaks, not paragraphs
+                - Use emojis appropriately to make learning fun
+                - If user writes in another language, respond with Tamil translation and pronunciation
+
+                Respond helpfully to the user's message about learning Tamil.`;
+
+            const requestBody = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 1024,
+                }
+            };
+
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        function addChatMessage(message, type) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message message-${type}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${message.replace(/\n/g, '<br>')}
+                    ${type === 'bot' ? `<button class="btn btn-sm btn-outline-primary mt-2" onclick="speakText('${message.replace(/'/g, "\\'")}')"><i class="bi bi-volume-up"></i></button>` : ''}
+                </div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function setChatInput(text) {
+            document.getElementById('chatInput').value = text;
+        }
+
+        function clearChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = `
+                <div class="chat-message message-bot">
+                    <div class="message-bubble">
+                        <strong>வணக்கம்! (Vanakkam!)</strong><br><br>
+                        Welcome to your Tamil learning assistant! 🎉<br><br>
+                        I can help you with:<br>
+                        ✨ <strong>Translation:</strong> Type in any language and I'll translate to Tamil with pronunciation<br>
+                        🎯 <strong>Learning:</strong> Ask questions about Tamil grammar, culture, or phrases<br>
+                        🗣️ <strong>Practice:</strong> Have conversations to improve your Tamil skills<br>
+                        📚 <strong>Lessons:</strong> Get explanations about specific topics<br><br>
+                        What would you like to learn today?
+                    </div>
+                </div>
+            `;
+        }
+
+        // Voice Functions
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatInput').value = transcript;
+                    stopVoiceRecording();
+                };
+                
+                recognition.onerror = function() {
+                    stopVoiceRecording();
+                };
+                
+                recognition.onend = function() {
+                    stopVoiceRecording();
+                };
+            }
+        }
+
+        function toggleVoiceRecording() {
+            if (isRecording) {
+                stopVoiceRecording();
+            } else {
+                startVoiceRecording();
+            }
+        }
+
+        function startVoiceRecording() {
+            if (recognition) {
+                isRecording = true;
+                recognition.start();
+                
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.add('recording');
+                voiceBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                
+                document.getElementById('voiceStatus').style.display = 'block';
+                document.getElementById('voiceStatusText').textContent = 'Listening...';
+            }
+        }
+
+        function stopVoiceRecording() {
+            if (recognition && isRecording) {
+                isRecording = false;
+                recognition.stop();
+                
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '<i class="bi bi-mic"></i>';
+                
+                document.getElementById('voiceStatus').style.display = 'none';
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/<[^>]*>/g, '');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Game Functions
+        function startLesson(lessonName) {
+            analytics.logEvent('lesson_started', {
+                lesson_name: lessonName
+            });
+            
+            alert(`Starting ${lessonName}! 🎉\n\nThis would open the interactive lesson interface.`);
+            
+            // Simulate XP gain
+            userState.xp += 25;
+            updateUserStats();
+        }
+
+        function startModule(moduleName) {
+            analytics.logEvent('module_started', {
+                module_name: moduleName
+            });
+            
+            alert(`Starting ${moduleName} module! 📚\n\nThis would open the module learning interface.`);
+            
+            // Simulate XP gain
+            userState.xp += 50;
+            updateUserStats();
+        }
+
+        function startChallenge(challengeName) {
+            analytics.logEvent('challenge_started', {
+                challenge_name: challengeName
+            });
+            
+            alert(`Starting ${challengeName}! 🏆\n\nThis would open the challenge interface.`);
+        }
+
+        function joinContest(contestName) {
+            analytics.logEvent('contest_joined', {
+                contest_name: contestName
+            });
+            
+            alert(`Joined ${contestName}! 🎯\n\nYou'll receive notifications about contest updates.`);
+        }
+    </script>
+</body>
 </html>
